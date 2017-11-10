@@ -29,17 +29,31 @@ myApp.config(function ($stateProvider) {
         }
       }
     },
+    
+    // {
+    //   name: 'person',
+    //   // This state takes a URL parameter called personId
+    //   url: '/people/{personId}',
+    //   component: 'person',
+    //   // This state defines a 'person' resolve
+    //   // It delegates to the PeopleService, passing the personId parameter
+    //   resolve: {
+    //     person: function (PeopleService, $transition$) {
+    //       return PeopleService.getPerson($transition$.params().personId);
+    //     }
+    //   }
+    // },
 
-    {
-      name: 'person',
-      // This state takes a URL parameter called personId
-      url: '/people/{personId}',
+    //Nesting State
+    { 
+      name: 'people.person', 
+      url: '/{personId}', 
       component: 'person',
-      // This state defines a 'person' resolve
-      // It delegates to the PeopleService, passing the personId parameter
       resolve: {
-        person: function (PeopleService, $transition$) {
-          return PeopleService.getPerson($transition$.params().personId);
+        person: function(people, $stateParams) {
+          return people.find(function(person) { 
+            return person.id === $stateParams.personId;
+          });
         }
       }
     }
@@ -57,8 +71,8 @@ myApp.config(function ($stateProvider) {
 // });
 
 // Show state tree
-myApp.run(function ($uiRouter) {
-  var StateTree = window['ui-router-visualizer'].StateTree;
-  var el = StateTree.create($uiRouter, null, { height: 100, width: 300 });
-  el.className = 'statevis';
+myApp.run(function($http, $uiRouter) {
+  var Visualizer = window['ui-router-visualizer'].Visualizer;
+  $uiRouter.plugin(Visualizer);
+  $http.get('data/people.json', { cache: true });
 });
